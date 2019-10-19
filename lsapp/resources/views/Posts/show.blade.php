@@ -18,14 +18,25 @@
             {!! Form::close() !!}
         @endif
     @endif
-
+    <br><br>
+    <h2>Comments:</h2><br>
     {{-- Comment Logic --}}
             <div class="comment-list">
                 @foreach ($post->comments as $comment)
+                <div class="well">
                     <h4>{{ $comment->body }}</h4>
                     <lead>{{ $comment->user->name }}</lead>
                     <br>
+                            {{-- Writhing --}}
+                                <a href="{{route('comment.edit',$comment->id)}}" class="btn btn-info btn-xs">Edit</a>
+
+                            {{-- end --}}
+                            {!! Form::open(['action' => ['CommentController@destroy', $comment->id], 'method' => 'POST', 'class' => 'pull-left']) !!}
+                            {!! Form::hidden('_method', 'DELETE') !!}
+                            {!! Form::submit('Delete', ['class' => 'btn btn-danger']) !!}
+                            {!! Form::close() !!}
                     <br>
+                </div>
                 @endforeach
             </div>
             <div class="comment-from">
@@ -39,5 +50,5 @@
                     <button type="submit" class="btn btn-primary">Comment </button>
                 </form>
             </div>
-
+            <br><br><br><br>
 @endsection

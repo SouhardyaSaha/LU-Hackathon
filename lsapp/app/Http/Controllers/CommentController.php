@@ -70,9 +70,15 @@ class CommentController extends Controller
      * @param  \App\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function edit(Comment $comment)
+    public function edit($id)
     {
-        //
+        $comment = Comment::find($id);
+
+        ///check for correct user
+        if(auth()->user()->id != $comment->user_id){
+            return back()->with('error', 'unauthorized access');;
+        }
+        return view('comments.edit')->with('comment', $comment);
     }
 
     /**
@@ -82,9 +88,18 @@ class CommentController extends Controller
      * @param  \App\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Comment $comment)
+    public function update(Request $request, $id)
     {
-        //
+        $this->validate($request, [
+            'body' => 'required'
+        ]);
+
+        //create post
+        $comment = Comment::find($id);
+        $comment->body = $request->input('body');
+        $comment->save();
+
+        return redirect('/posts')->with('success', 'Comment Updated');
     }
 
     /**
@@ -95,6 +110,11 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        //
+        if($comment->user_id !== auth()->user()->id)
+            return back()->with('error', 'Authoriazation Declined!');
+
+        $comment->delete();
+
+        return back()->with('success', 'Deleted');
     }
 }
